@@ -48,19 +48,62 @@ $perfil = $_SESSION['perfil'];
         echo '<td>' . $registro['descricao'];
         echo '<br/><a href="#?id='.$id.'" data-bs-toggle="modal" data-bs-target="#comentar'.$id.'"><img src="img_sis/comentario.png" width="30" height="30"></a>&nbsp;&nbsp;&nbsp;&nbsp;';
         ?>
-        <div class="modal fade" id="comentar<?php echo $id; ?>" tabindex="-1" aria-labelledby="apagar" aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" id="comentar<?php echo $id; ?>" tabindex="-1" aria-labelledby="comentar" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="exampleModalLabel">Comentários</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
               <div class="modal-body">
-                <?php echo $id; ?>
-                Comentários
+                <?php 
+                  $pesquisa3 = mysqli_query($conn, "SELECT comentarios.*, perfis.* from comentarios,perfis where comentarios.perfil = perfis.id and comentarios.equipamento = $id");
+                  $row3 = mysqli_num_rows($pesquisa3);
+                  if ($row3> 0) {
+                    while ($registro3 = $pesquisa3->fetch_array()) {
+                      $id = $registro3['id'];
+                      $date = date_create($registro3['data']);
+                      $data3 = date_format($date, 'd/m/Y');
+                      echo '<table>';
+                      echo '<tr>';
+                      echo '<td><b>' . $registro3['perfil'] . '</b></td>';
+                      echo '<td>' .$data3.'</td>';
+                      echo '</tr>';
+                      echo '<tr>';
+                      echo '<td>'.$registro3['comentario'].'</td>';
+                      echo '</tr>';
+                      echo '</table>';
+                    }
+                  }
+                  else {
+                    echo "Não há registros de comentários!";
+                  }
+                ?>
               </div>
              <div class="modal-footer">
-              <a href="delete.php?id=<?php echo $id; ?>"><button type="button" class="btn btn-danger">Excluir</button></a>
+              <button type="button" class="btn btn-success" data-bs-target="#inserircomentario<?php echo $id; ?>" data-bs-toggle="modal" data-bs-dismiss="modal">Cadastrar Comentário</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="inserircomentario<?php echo $id; ?>" tabindex="-1" aria-labelledby="apagar" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Comentário</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+              <div class="modal-body">
+                <?php
+                  $id = $id;
+                ?>
+                <form action="cadastrocomentario.php?id=<?php echo $id; ?>" method="POST">
+                <textarea class="form-control" rows="3" placeholder="Insira seu comentário" name="comentario"></textarea>
+              </div>
+             <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Cadastrar</button></a>
+                </form>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             </div>
           </div>
@@ -135,5 +178,4 @@ $perfil = $_SESSION['perfil'];
     </div>
   </div>
 </body>
-
 </html>
